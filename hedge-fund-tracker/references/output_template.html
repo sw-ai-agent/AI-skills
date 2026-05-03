@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<!--
+  Output template for hedge-fund-tracker results.
+  Dark theme, minimal, scannable.
+  Replace the placeholders marked {{ ... }} with computed values.
+-->
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; margin: 0; padding: 24px; }
+  h2 { color: #fff; font-size: 20px; margin-bottom: 4px; }
+  .subtitle { color: #94a3b8; font-size: 12px; margin-bottom: 20px; line-height: 1.6; }
+
+  .info-box { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3); border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; font-size: 12px; color: #a5b4fc; }
+  .warn-box { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; font-size: 12px; color: #fbbf24; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 28px; }
+  thead tr { background: #1e293b; }
+  thead th { padding: 10px 10px; text-align: left; color: #94a3b8; font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1px solid #334155; white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid #1e293b; }
+  tbody tr:hover { background: #1a2236; }
+  td { padding: 10px 10px; vertical-align: top; }
+
+  .rank      { font-size: 18px; font-weight: 800; color: #475569; text-align: center; }
+  .rank-1    { color: #f59e0b; }
+  .rank-2    { color: #94a3b8; }
+  .rank-3    { color: #b87333; }
+
+  .ticker    { font-weight: 800; font-size: 15px; color: #fff; }
+  .company   { color: #64748b; font-size: 11px; margin-top: 2px; }
+
+  .metric    { font-weight: 800; font-size: 16px; color: #22c55e; }
+  .metric-sub{ font-size: 11px; color: #64748b; margin-top: 2px; }
+
+  .stars     { color: #f59e0b; font-size: 14px; letter-spacing: -1px; }
+  .stars-sub { color: #94a3b8; font-size: 10px; }
+
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; }
+  .badge-pass { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+  .badge-fail { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.25); }
+
+  .n-funds-badge { display: inline-flex; align-items: center; gap: 4px; background: #1e293b; border: 1px solid #334155; border-radius: 999px; padding: 3px 9px; font-size: 11px; font-weight: 600; }
+  .n-8 { border-color: #22c55e; color: #22c55e; }
+  .n-6 { border-color: #6366f1; color: #a5b4fc; }
+  .n-5 { border-color: #8b5cf6; color: #c4b5fd; }
+  .n-4 { border-color: #0ea5e9; color: #7dd3fc; }
+  .n-3 { border-color: #f59e0b; color: #fcd34d; }
+  .n-2 { border-color: #64748b; color: #94a3b8; }
+  .n-1 { border-color: #374151; color: #6b7280; }
+
+  .fund-list { font-size: 11px; }
+  .fund-row  { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px dashed #1e293b; gap: 8px; }
+  .fund-row:last-child { border-bottom: none; }
+  .fund-nm   { color: #94a3b8; flex: 1; }
+  .fund-pc   { color: #6366f1; font-weight: 700; width: 44px; text-align: right; }
+
+  .perf-positive { color: #22c55e; font-weight: 700; }
+  .perf-negative { color: #ef4444; font-weight: 700; }
+  .perf-neutral  { color: #94a3b8; font-weight: 600; }
+
+  .section-title { font-size: 13px; font-weight: 700; color: #c084fc; margin: 28px 0 12px; padding-bottom: 6px; border-bottom: 1px solid #1e293b; }
+  .footnotes { margin-top: 24px; border-top: 1px solid #1e293b; padding-top: 14px; }
+  .footnotes p { font-size: 11px; color: #64748b; margin: 5px 0; }
+</style>
+</head>
+<body>
+
+<h2>{{ TITLE }}</h2>
+<p class="subtitle">{{ SUBTITLE }}</p>
+
+<div class="info-box">{{ KEY_INSIGHT }}</div>
+
+<!-- Optional warning box for caveats like Berkshire dominance -->
+<!-- <div class="warn-box">⚠️ {{ WARNING }}</div> -->
+
+<!-- ============= FUND COMPARISON ============= -->
+<div class="section-title">📊 Fund Comparison</div>
+<table>
+  <thead>
+    <tr>
+      <th>Fund / Manager</th>
+      <th>AUM (13F)</th>
+      <th>Rating</th>
+      <th>Top 3 Holdings</th>
+      <th>Top-3 %</th>
+      <th>3-yr Return</th>
+      <th>vs S&amp;P</th>
+      <th>Passes?</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{ FUND_ROWS }}
+  </tbody>
+</table>
+
+<!-- ============= EQUAL-WEIGHTED CONSENSUS ============= -->
+<div class="section-title">🤝 Equal-Weighted Aggregated Positions</div>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Ticker / Company</th>
+      <th>Avg %</th>
+      <th>Conviction</th>
+      <th>Fund Breakdown</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{ EQUAL_WEIGHTED_ROWS }}
+  </tbody>
+</table>
+
+<!-- ============= AUM-WEIGHTED ============= -->
+<div class="section-title">💰 AUM-Weighted Aggregated Positions ($B exposure)</div>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Ticker / Company</th>
+      <th>Total $B</th>
+      <th># Funds</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{ AUM_WEIGHTED_ROWS }}
+  </tbody>
+</table>
+
+<div class="footnotes">
+  <p>★ <strong>Source:</strong> Live HedgeFollow.com 13F data (long U.S. equity only). Star rating from {{ DATE }}.</p>
+  <p>★ <strong>Equal-weighted method:</strong> Each fund counts as 1/N regardless of AUM. Avg % = Σ(fund position %) ÷ N. Funds not holding contribute 0%.</p>
+  <p>★ <strong>GOOG/GOOGL:</strong> Both Alphabet share classes are merged.</p>
+  <p>★ <strong>Caveat:</strong> 13F data excludes shorts, bonds, options premiums, cash, and non-U.S. holdings. "AUM" shown is 13F long equity AUM, not total firm AUM.</p>
+</div>
+
+</body>
+</html>
